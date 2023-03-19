@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "892241325065",
+    "project_id": "crypto-bot-2635d",
+    "storage_bucket": "crypto-bot-2635d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:892241325065:android:828a36784bec74fcbbdcd8",
+        "android_client_info": {
+          "package_name": "com.booringcodes.crypto_bot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "892241325065-bn9fvqqlocot7tdjbb2kk5814lobjeu7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnu12dJVOfY5ut5ntI7PkDdSpF_Gg-Owc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "892241325065-bn9fvqqlocot7tdjbb2kk5814lobjeu7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
