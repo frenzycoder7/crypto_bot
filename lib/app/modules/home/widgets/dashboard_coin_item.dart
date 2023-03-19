@@ -35,7 +35,7 @@ class DashBoardCoinItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${coinModel.symbol} × ${coinModel.leverage}',
+                        '${coinModel.symbol} × ${coinModel.leverage} - MT: ${coinModel.maxTrade == -1 ? '∞' : coinModel.maxTrade} OOMP: ${coinModel.buyOnMarketAfterSell}',
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize: 15,

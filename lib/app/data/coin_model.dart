@@ -16,6 +16,8 @@ class CoinModel {
   int? precision;
   String? createdAt;
   bool? reorderOnSell;
+  int? maxTrade;
+  bool? buyOnMarketAfterSell;
 
   CoinModel({
     this.sId,
@@ -35,6 +37,8 @@ class CoinModel {
     this.todayLow = '0.0',
     this.todayHigh = '0.0',
     this.reorderOnSell = false,
+    this.maxTrade,
+    this.buyOnMarketAfterSell,
   });
 
   CoinModel.fromJson(Map<String, dynamic> json) {
@@ -59,6 +63,8 @@ class CoinModel {
     precision = json['precision'];
     createdAt = json['createdAt'];
     reorderOnSell = json['reorderOnSell'];
+    maxTrade = json['maxTrade'];
+    buyOnMarketAfterSell = json['buyOnMarketAfterSell'];
   }
 
   Map<String, dynamic> toJson() {

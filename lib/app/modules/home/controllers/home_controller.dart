@@ -141,11 +141,10 @@ class HomeController extends GetConnect implements GetxService {
           totalProfit.value = response.body['data']['total'];
         }
         DateTime now = DateTime.now();
-
         if (response.body['data']['data'][now.toString().split(' ').first] !=
             null) {
-          todayProfit.value =
-              response.body['data']['data'][now.toString().split(' ').first];
+          todayProfit.value = response.body['data']['data']
+              [now.toString().split(' ').first]['profit'];
         }
         loadingProfit.value = false;
       } else {
@@ -164,10 +163,9 @@ class HomeController extends GetConnect implements GetxService {
       int skip = pageKey ~/ pageSize.value;
       Response response =
           await get('coin/orders?limit=$pageSize&skip=$skip&status=$status');
-      print(response.body);
       if (response.statusCode == 200) {
         List<Order> orders = [];
-        for (var order in response.body['data']) {
+        for (var order in response.body['orders']) {
           orders.add(Order.fromJson(order));
         }
         final isLastPage = orders.length < pageSize.value;
@@ -181,7 +179,6 @@ class HomeController extends GetConnect implements GetxService {
         pagingController.error = response.body['message'];
       }
     } catch (e) {
-      print(e.toString());
       pagingController.error = e.toString();
     }
   }

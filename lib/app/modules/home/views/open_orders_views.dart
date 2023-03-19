@@ -406,23 +406,30 @@ class OpenOrderView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: homeController.status.value == 'OPEN'
-                                ? Text(
-                                    DateTime.parse(item.createdAt.toString())
-                                        .toLocal()
-                                        .toString()
-                                        .split('.')
-                                        .first,
-                                  )
-                                : Text(
-                                    DateTime.parse(item.updatedAt.toString())
-                                        .toLocal()
-                                        .toString()
-                                        .split('.')
-                                        .first,
-                                  ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                child: homeController.status.value == 'OPEN'
+                                    ? Text(
+                                        DateTime.parse(
+                                                item.createdAt.toString())
+                                            .toLocal()
+                                            .toString()
+                                            .split('.')
+                                            .first,
+                                      )
+                                    : Text(
+                                        DateTime.parse(
+                                                item.updatedAt.toString())
+                                            .toLocal()
+                                            .toString()
+                                            .split('.')
+                                            .first,
+                                      ),
+                              ),
+                              Text('TC: ${item.tradeCount}'),
+                            ],
                           ),
                           Divider(
                             color: Colors.grey.shade600,

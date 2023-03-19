@@ -10,6 +10,7 @@ class Order {
   double? profit;
   int? leverage;
   double? marketSellPrice;
+  int? tradeCount = 1;
 
   Order({
     this.sId,
@@ -23,6 +24,7 @@ class Order {
     this.profit,
     this.leverage,
     this.marketSellPrice = 0.0,
+    this.tradeCount = 1,
   });
 
   Order.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class Order {
         : json['exitPrice'].runtimeType == int
             ? json['exitPrice'].toDouble()
             : json['exitPrice'];
+    tradeCount = json['tradeCount'];
   }
 
   Map<String, dynamic> toJson() {
