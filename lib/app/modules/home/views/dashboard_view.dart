@@ -28,12 +28,45 @@ class Dashboard extends StatelessWidget {
           Container(
             alignment: Alignment.topLeft,
             padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Text(
-              'Your Earnings',
-              style: GoogleFonts.firaSans(
-                color: Colors.black,
-                fontSize: 20,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Your Earnings',
+                  style: GoogleFonts.firaSans(
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.lightBlueAccent,
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Bal: ',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 15,
+                        ),
+                      ),
+                      Obx(() {
+                        return Text(
+                          homeController.remainingBalance.toStringAsFixed(2),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 15,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
           EarningView(

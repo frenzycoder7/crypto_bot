@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:crypto_bot/app/data/coin_model.dart';
 import 'package:crypto_bot/app/data/order_model.dart';
+import 'package:crypto_bot/app/data/profit_item.dart';
 import 'package:crypto_bot/app/data/stream_ticker.dart';
 import 'package:crypto_bot/config.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,7 +12,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+class ChartData {
+  ChartData(this.x, this.y);
+
+  final String x;
+  final double y;
+}
 
 class HomeController extends GetConnect implements GetxService {
   RxList<CoinModel> coins = <CoinModel>[].obs;
@@ -22,9 +31,14 @@ class HomeController extends GetConnect implements GetxService {
   RxBool loadingProfit = false.obs;
   RxDouble todayProfit = 0.0.obs;
   RxDouble totalProfit = 0.0.obs;
+  RxList<ChartData> data = <ChartData>[].obs;
+  TooltipBehavior tooltip = TooltipBehavior(enable: true);
+
+  RxMap<String, ProfitItem> profitMap = <String, ProfitItem>{}.obs;
 
   RxString status = 'OPEN'.obs;
   RxInt pageSize = 10.obs;
+  RxDouble remainingBalance = 0.0.obs;
 
   late PagingController<int, Order> pagingController;
 
@@ -146,6 +160,15 @@ class HomeController extends GetConnect implements GetxService {
           todayProfit.value = response.body['data']['data']
               [now.toString().split(' ').first]['profit'];
         }
+        var data = response.body['data']['data'];
+        List<String> keys = data.keys.toList();
+        List<ChartData> items = [];
+        this.data.clear();
+        for (String key in keys) {
+          items.add(ChartData(key, data[key]['profit']));
+        }
+        this.data.addAll(items);
+        await getRemainingBalance();
         loadingProfit.value = false;
       } else {
         loadingProfit.value = false;
@@ -186,5 +209,20 @@ class HomeController extends GetConnect implements GetxService {
   setStatus({required String status}) {
     this.status.value = status;
     pagingController.refresh();
+  }
+
+  getRemainingBalance() async {
+    try {
+      Response response = await get('account/balance');
+      if (response.statusCode == 200) {
+        remainingBalance.value = response.body['USDT'].runtimeType == 'int'
+            ? response.body['USDT'].toDouble()
+            : response.body['USDT'];
+      } else {
+        Fluttertoast.showToast(msg: 'Error while fetching balance');
+      }
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'Error while fetching balance');
+    }
   }
 }

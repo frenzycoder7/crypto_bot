@@ -26,7 +26,7 @@ class DashBoardCoinItem extends StatelessWidget {
             color: Colors.white,
           ),
           child: Padding(
-            padding: EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
             child: Row(
               children: [
                 Expanded(
