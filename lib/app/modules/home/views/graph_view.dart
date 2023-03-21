@@ -24,7 +24,15 @@ class GraphView extends GetView<HomeController> {
                     xValueMapper: (ChartData sales, _) => sales.x,
                     yValueMapper: (ChartData sales, _) => sales.y,
                     dataLabelSettings: const DataLabelSettings(isVisible: true),
-                  )
+                    color: Colors.greenAccent,
+                  ),
+                  LineSeries<ChartData, String>(
+                    dataSource: controller.tradeCount.value,
+                    xValueMapper: (ChartData sales, _) => sales.x,
+                    yValueMapper: (ChartData sales, _) => sales.y,
+                    dataLabelSettings: const DataLabelSettings(isVisible: true),
+                    color: Colors.blueAccent,
+                  ),
                 ],
               ),
         onRefresh: () {

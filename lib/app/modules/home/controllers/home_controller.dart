@@ -32,9 +32,8 @@ class HomeController extends GetConnect implements GetxService {
   RxDouble todayProfit = 0.0.obs;
   RxDouble totalProfit = 0.0.obs;
   RxList<ChartData> data = <ChartData>[].obs;
+  RxList<ChartData> tradeCount = <ChartData>[].obs;
   TooltipBehavior tooltip = TooltipBehavior(enable: true);
-
-  RxMap<String, ProfitItem> profitMap = <String, ProfitItem>{}.obs;
 
   RxString status = 'OPEN'.obs;
   RxInt pageSize = 10.obs;
@@ -163,9 +162,25 @@ class HomeController extends GetConnect implements GetxService {
         var data = response.body['data']['data'];
         List<String> keys = data.keys.toList();
         List<ChartData> items = [];
+
         this.data.clear();
+        tradeCount.clear();
         for (String key in keys) {
-          items.add(ChartData(key, data[key]['profit']));
+          items.add(
+            ChartData(
+              key,
+              data[key]['profit'].runtimeType == 'int'
+                  ? double.parse(data[key]['profit'])
+                  : data[key]['profit'],
+            ),
+          );
+
+          tradeCount.add(
+            ChartData(
+              key,
+              data[key]['tc'].toDouble(),
+            ),
+          );
         }
         this.data.addAll(items);
         await getRemainingBalance();
