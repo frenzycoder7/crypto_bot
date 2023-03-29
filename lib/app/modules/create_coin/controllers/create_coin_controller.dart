@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:crypto_bot/config.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 
-class CreateCoinController extends GetConnect implements GetxService {
+class CreateCoinController extends GetxController {
   TextEditingController coinNameController = TextEditingController();
   TextEditingController coinAmount = TextEditingController();
   RxInt leverage = 1.obs;
@@ -12,8 +15,13 @@ class CreateCoinController extends GetConnect implements GetxService {
   RxBool reorderOnBuy = false.obs;
   RxInt sellPercentage = 1.obs;
   RxInt buyPercentage = 1.obs;
+  RxInt maxTrade = 1.obs;
+  RxBool oomp = false.obs;
+  RxBool isDeleting = false.obs;
 
   RxBool isCreating = false.obs;
+  RxString name = ''.obs;
+  RxBool editMode = false.obs;
 
   increaseLeverage() {
     leverage.value++;
@@ -24,6 +32,18 @@ class CreateCoinController extends GetConnect implements GetxService {
       leverage.value--;
     } else {
       Fluttertoast.showToast(msg: 'Leverage cannot be less than 1');
+    }
+  }
+
+  increaseMaxTrade() {
+    maxTrade.value++;
+  }
+
+  decreaseMaxTrade() {
+    if (maxTrade.value > -1) {
+      maxTrade.value--;
+    } else {
+      Fluttertoast.showToast(msg: 'Max Trade cannot be less than 1');
     }
   }
 
@@ -74,7 +94,36 @@ class CreateCoinController extends GetConnect implements GetxService {
   @override
   void onInit() {
     super.onInit();
-    httpClient.baseUrl = AppConfig.baseUrl;
+    Args args = Get.arguments as Args;
+    if (args.create == true) {
+      name.value = 'CREATE COIN';
+    } else {
+      editMode.value = true;
+      name.value = 'EDIT COIN ${args.coinModel.symbol}';
+      coinNameController.text = args.coinModel.symbol as String;
+      coinAmount.text = args.coinModel.amount.toString();
+      leverage.value = args.coinModel.leverage as int;
+      precision.value = args.coinModel.precision as int;
+      sellPercentage.value = args.coinModel.takeProfitPercent!.toInt();
+      reorderOnBuy.value = args.coinModel.reorder as bool;
+      buyPercentage.value = args.coinModel.reorderPercent!.toInt();
+      reorderOnSell.value = args.coinModel.reorderOnSell as bool;
+      oomp.value = args.coinModel.buyOnMarketAfterSell as bool;
+      maxTrade.value = args.coinModel.maxTrade as int;
+    }
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    print('Disposing');
+    dispose();
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    print('Ready');
   }
 
   void createdCoin() async {
@@ -91,15 +140,28 @@ class CreateCoinController extends GetConnect implements GetxService {
       Map<String, dynamic> body = {
         'symbol': coinNameController.text,
         'amount': coinAmount.text,
-        'leverage': leverage.value,
-        'precision': precision.value,
-        'takeProfitPercent': sellPercentage.value,
-        'reorder': reorderOnBuy.value,
-        'reorderPercent': buyPercentage.value,
-        'reorderOnSell': reorderOnSell.value,
+        'leverage': leverage.value.toString(),
+        'precision': precision.value.toString(),
+        'takeProfitPercent': sellPercentage.value.toString(),
+        'reorder': reorderOnBuy.value.toString(),
+        'reorderPercent': buyPercentage.value.toString(),
+        'reorderOnSell': reorderOnSell.value.toString(),
+        'buyOnMarketAfterSell': oomp.value.toString(),
+        'maxTrade': maxTrade.value.toString(),
       };
-      Response response = await post('coin', body);
-      if (response.statusCode == 201) {
+      if (editMode.isTrue) {
+        body.remove('symbol');
+      }
+      http.Response res = editMode.isTrue
+          ? await http.patch(
+              Uri.parse(
+                '${AppConfig.baseUrl}coin/${coinNameController.text}',
+              ),
+              body: body,
+            )
+          : await http.post(Uri.parse('${AppConfig.baseUrl}coin'), body: body);
+      var response = json.decode(res.body);
+      if (res.statusCode == 201) {
         coinNameController.clear();
         coinAmount.clear();
         leverage.value = 1;
@@ -107,12 +169,33 @@ class CreateCoinController extends GetConnect implements GetxService {
         sellPercentage.value = 1;
         Fluttertoast.showToast(msg: 'Coin created');
       } else {
-        Fluttertoast.showToast(msg: response.body['message']);
+        Fluttertoast.showToast(msg: response['message']);
       }
       isCreating.value = false;
     } catch (e) {
+      print(e);
       isCreating.value = false;
       Fluttertoast.showToast(msg: 'Error creating coin');
+    }
+  }
+
+  deleteCoin() async {
+    try {
+      isDeleting.value = true;
+      http.Response response = await http.delete(
+        Uri.parse('${AppConfig.baseUrl}coin/${coinNameController.text}'),
+      );
+      var res = json.decode(response.body);
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: 'Coin deleted successfully');
+        Get.back();
+      } else {
+        Fluttertoast.showToast(msg: res['message']);
+      }
+      isDeleting.value = false;
+    } catch (e) {
+      isDeleting.value = false;
+      Fluttertoast.showToast(msg: 'Something went wrong');
     }
   }
 }

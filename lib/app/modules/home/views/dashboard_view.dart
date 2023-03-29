@@ -4,6 +4,7 @@ import 'package:crypto_bot/app/modules/home/widgets/dashboard_coin_item.dart';
 import 'package:crypto_bot/app/modules/home/widgets/earning_views.dart';
 import 'package:crypto_bot/app/modules/home/widgets/hero_button.dart';
 import 'package:crypto_bot/app/routes/app_pages.dart';
+import 'package:crypto_bot/config.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -90,7 +91,13 @@ class Dashboard extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Get.toNamed(Routes.CREATE_COIN);
+                    Get.toNamed(
+                      Routes.CREATE_COIN,
+                      arguments: Args(
+                        create: true,
+                        coinModel: CoinModel(),
+                      ),
+                    );
                   },
                   style: ButtonStyle(
                     backgroundColor: MaterialStateProperty.all(
@@ -130,8 +137,11 @@ class Dashboard extends StatelessWidget {
                                 return InkWell(
                                   onTap: () {
                                     Get.toNamed(
-                                      Routes.COIN_DETAILS,
-                                      arguments: coinModel,
+                                      Routes.CREATE_COIN,
+                                      arguments: Args(
+                                        create: false,
+                                        coinModel: coinModel,
+                                      ),
                                     );
                                   },
                                   child: DashBoardCoinItem(

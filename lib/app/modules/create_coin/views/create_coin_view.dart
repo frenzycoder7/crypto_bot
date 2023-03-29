@@ -19,11 +19,13 @@ class CreateCoinView extends GetView<CreateCoinController> {
             Get.back();
           },
         ),
-        title: Text(
-          'Add Coin',
-          style: GoogleFonts.poppins(
-              color: Colors.black, fontWeight: FontWeight.w400),
-        ),
+        title: Obx(() {
+          return Text(
+            controller.name.value,
+            style: GoogleFonts.poppins(
+                color: Colors.black, fontWeight: FontWeight.w400),
+          );
+        }),
         centerTitle: true,
       ),
       body: Padding(
@@ -39,6 +41,7 @@ class CreateCoinView extends GetView<CreateCoinController> {
               ),
               child: TextField(
                 controller: controller.coinNameController,
+                enabled: controller.editMode.isFalse,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Enter Coin Name',
@@ -372,6 +375,57 @@ class CreateCoinView extends GetView<CreateCoinController> {
               child: Row(
                 children: [
                   InkWell(
+                    onTap: controller.decreaseMaxTrade,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade200,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.remove, color: Colors.white),
+                    ),
+                  ),
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Max Trade'),
+                        Obx(() {
+                          return Text('${controller.maxTrade.value}');
+                        })
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: controller.increaseMaxTrade,
+                    child: Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.indigo.shade200,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.add, color: Colors.white),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Container(
+              height: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                children: [
+                  InkWell(
                     onTap: controller.decreasePrecision,
                     child: Container(
                       height: 50,
@@ -415,6 +469,20 @@ class CreateCoinView extends GetView<CreateCoinController> {
               height: 10,
             ),
             Obx(() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Checkbox(
+                    value: controller.oomp.value,
+                    onChanged: (value) {
+                      controller.oomp.value = value!;
+                    },
+                  ),
+                  const Text('Order on market price'),
+                ],
+              );
+            }),
+            Obx(() {
               return controller.isCreating.isTrue
                   ? Container(
                       alignment: Alignment.center,
@@ -429,12 +497,27 @@ class CreateCoinView extends GetView<CreateCoinController> {
                         ),
                       ),
                       onPressed: controller.createdCoin,
-                      child: const Text('SAVE & CREATE COIN'),
+                      child: controller.editMode.isTrue
+                          ? Text('UPDATE COIN')
+                          : const Text('SAVE & CREATE COIN'),
                     );
             })
           ],
         ),
       ),
+      floatingActionButton: Obx(() {
+        return controller.editMode.isTrue
+            ? FloatingActionButton(
+                onPressed: () {
+                  if (controller.isDeleting.isTrue) return;
+                  controller.deleteCoin();
+                },
+                child: controller.isDeleting.isTrue
+                    ? const CircularProgressIndicator()
+                    : const Icon(Icons.delete),
+              )
+            : const SizedBox();
+      }),
     );
   }
 }
